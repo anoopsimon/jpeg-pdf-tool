@@ -1,7 +1,6 @@
-# This workflow builds and tests a Golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+# This workflow builds, tests, and creates a release for a Golang project.
 
-name: Go Build and Test
+name: Go Build, Test, and Release
 
 on:
   push:
@@ -49,3 +48,46 @@ jobs:
       with:
         name: test-report
         path: coverage.out
+
+  release:
+    needs: build  # Run only after build job completes
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Only run on main branch
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'  # Latest stable version
+
+    - name: Build Release Binary
+      run: go build -o jpeg-pdf-tool  # Output a binary with a clear name
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "v1.0.${{ github.run_number }}"
+        release_name: "Release v1.0.${{ github.run_number }}"
+        body: |
+          Automated release of JPEG to PDF Converter.
+          This release includes:
+          - Conversion of JPEG images to PDF
+          - Folder or file-based conversion options
+          - CLI options for easy use
+        draft: false
+        prerelease: false
+
+    - name: Upload Binary to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./jpeg-pdf-tool  # Path to the binary built in the previous step
+        asset_name: jpeg-pdf-tool
+        asset_content_type: application/octet-stream
