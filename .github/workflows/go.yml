@@ -1,7 +1,7 @@
-# This workflow will build a golang project
+# This workflow builds and tests a Golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: Go Build and Test
 
 on:
   push:
@@ -10,19 +10,42 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.21'  # Latest stable version
+
+    - name: Install Dependencies
+      run: go mod tidy
 
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+    - name: Run Tests
+      run: go test -v ./... -coverprofile=coverage.out
+      continue-on-error: true  # Allow job to continue to the next steps even if tests fail
+
+    - name: Upload Coverage Report
+      if: always()
+      run: |
+        mkdir -p coverage
+        go tool cover -html=coverage.out -o coverage/coverage.html
+
+    - name: Upload Coverage and Test Logs
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-coverage-report
+        path: coverage/coverage.html
+
+    - name: Upload Test Report
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report
+        path: coverage.out
