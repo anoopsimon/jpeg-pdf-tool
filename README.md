@@ -1,6 +1,9 @@
 
 # JPEG to PDF Converter
 
+![Build Status](https://github.com/anoopsimon/jpeg-pdf-tool/actions/workflows/go.yml/badge.svg)
+
+
 This tool converts multiple JPEG images into a single PDF file using Go. You can provide images by specifying a folder or a comma-separated list of filenames.
 
 ## Features
