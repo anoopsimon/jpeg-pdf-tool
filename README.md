@@ -53,16 +53,20 @@ jpeg-pdf-tool -files=<file1.jpg,file2.jpg,...> -output=<output_pdf_filename>
 ### Examples
 
 1. **Convert all JPEG images in a folder to a PDF**:
+   
    ```bash
    jpeg-pdf-tool -folder=imgs -output=output.pdf
    ```
 
-2. **Convert specified JPEG files to a PDF**:
-   ```bash
+2. **Convert specified JPEG files to a PDF**
+
+  ```bash
   jpeg-pdf-tool -files="imgs/image1.jpg,imgs/image2.jpg" -output=output.pdf
+
    ```
 
 3. **Convert with default output filename**:
+  
    ```bash
    jpeg-pdf-tool -folder=imgs
    ```
